@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "dgSpecHash": "b/cxNlIfQxLyL5k/2mWLoB+/V6wAMH4gKtZA1/g6wFjU90BUpq9mw99NQiae+F4eeTwXPsLLwh36IHNzeDInpw==",
+  "success": true,
+  "projectFilePath": "C:\\_DiscoLocal\\Projeto Leitor\\Xamarin_LeitorCodigoBarraQrCode\\Leitor\\Leitor.iOS\\Leitor.iOS.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\rodri\\.nuget\\packages\\system.numerics.vectors\\4.5.0\\system.numerics.vectors.4.5.0.nupkg.sha512",
+    "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\xamarin.essentials\\1.6.1\\xamarin.essentials.1.6.1.nupkg.sha512",
+    "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\xamarin.forms\\5.0.0.2012\\xamarin.forms.5.0.0.2012.nupkg.sha512",
+    "C:\\Users\\rodri\\.nuget\\packages\\zxing.net.mobile\\2.4.1\\zxing.net.mobile.2.4.1.nupkg.sha512",
+    "C:\\Users\\rodri\\.nuget\\packages\\zxing.net.mobile.forms\\2.4.1\\zxing.net.mobile.forms.2.4.1.nupkg.sha512"
+  ],
+  "logs": []
+}

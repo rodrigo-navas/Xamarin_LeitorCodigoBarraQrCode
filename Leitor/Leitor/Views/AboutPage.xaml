@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Leitor.Views.AboutPage"
+             xmlns:vm="clr-namespace:Leitor.ViewModels"
+             Title="{Binding Title}">
+
+    <ContentPage.BindingContext>
+        <vm:AboutViewModel />
+    </ContentPage.BindingContext>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Color x:Key="Accent">#96d1ff</Color>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Margin="0, 10, 0, 0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="100"></ColumnDefinition>
+                <ColumnDefinition Width="70"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40"></RowDefinition>
+            </Grid.RowDefinitions>
+
+            <Label Grid.Column="0" VerticalTextAlignment="Center"  HorizontalTextAlignment="Center" TextColor="Black" Text="Código:"></Label>
+            <Entry Grid.Column="1" x:Name="txtCodBarra" Unfocused="txtCodBarra_Unfocused" TextColor="Black" Text="{Binding CodigoBarra}" BackgroundColor="LightBlue" Margin="0, 0, 0, 0" ></Entry>
+            <Button Grid.Column="2" Text="Câmera" Command="{Binding Camera}" Margin="0, 0, 0, 0" BackgroundColor="{StaticResource Primary}" TextColor="White" />
+            <Button Grid.Column="3" Text="Ok" Margin="0, 0, 0, 0" Command="{Binding AddItem}" BackgroundColor="{StaticResource Primary}" TextColor="White" />
+        </Grid>
+
+        <CollectionView Grid.Row="1" 
+                        BackgroundColor="LightBlue"  
+                        ItemsSource="{Binding MinhaLista}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Grid Padding="10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <Label Grid.Column="0"
+                               Text="{Binding CodigoBarras}"
+                               FontAttributes="Bold"
+                               TextColor="Black"/>
+
+                        <Label Grid.Column="1"
+                               Text="{Binding NomeProduto}"
+                               FontAttributes="Italic"
+                               VerticalOptions="End"
+                               TextColor="Black"/>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+
+</ContentPage>

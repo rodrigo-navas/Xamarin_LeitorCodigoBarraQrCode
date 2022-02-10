@@ -1,0 +1,13 @@
+C:\_DiscoLocal\Projeto Leitor\Leitor\Leitor\Leitor.iOS\obj\iPhone\Debug\actool\_PartialAppManifest.items
+C:\_DiscoLocal\Projeto Leitor\Leitor\Leitor\Leitor.iOS\obj\iPhone\Debug\actool\_BundleResourceWithLogicalName.items
+C:\_DiscoLocal\Projeto Leitor\Leitor\Leitor\Leitor.iOS\obj\iPhone\Debug\actool\_ProcessedImageAssetsPath.items
+C:\_DiscoLocal\Projeto Leitor\Leitor\Leitor\Leitor.iOS\obj\iPhone\Debug\ibtool\_BundleResourceWithLogicalName.items
+C:\_DiscoLocal\Projeto Leitor\Leitor\Leitor\Leitor.iOS\obj\iPhone\Debug\ibtool\_ProcessedInterfaceDefinitionsPath.items
+C:\_DiscoLocal\Projeto Leitor\Leitor\Leitor\Leitor.iOS\obj\iPhone\Debug\coremlc\_PartialAppManifest.items
+C:\_DiscoLocal\Projeto Leitor\Leitor\Leitor\Leitor.iOS\obj\iPhone\Debug\coremlc\_BundleResourceWithLogicalName.items
+C:\_DiscoLocal\Projeto Leitor\Leitor\Leitor\Leitor.iOS\obj\iPhone\Debug\coremlc\_ProcessedCoreMLModelsPath.items
+C:\_DiscoLocal\Projeto Leitor\Leitor\Leitor\Leitor.iOS\obj\iPhone\Debug\_ProcessedBundleResourcesPath.items
+C:\_DiscoLocal\Projeto Leitor\Leitor\Leitor\Leitor.iOS\obj\iPhone\Debug\_ProcessedContentPath.items
+C:\_DiscoLocal\Projeto Leitor\Leitor\Leitor\Leitor.iOS\obj\iPhone\Debug\optimized\
+C:\_DiscoLocal\Projeto Leitor\Leitor\Leitor\Leitor.iOS\obj\iPhone\Debug\Leitor.iOS.csproj.AssemblyReference.cache
+C:\_DiscoLocal\Projeto Leitor\Leitor\Leitor\Leitor.iOS\obj\iPhone\Debug\Leitor.iOS.csproj.CoreCompileInputs.cache
