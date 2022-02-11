@@ -29,8 +29,8 @@
                 <ColumnDefinition Width="*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
 
-            <Label Grid.Column="0" FontSize="Subtitle" Margin="10, 0, 0, 10" TextColor="Orange" Text="&#xf071;" FontFamily="FontAwesomeBold"></Label>
-            <Label Grid.Column="1" FontSize="Subtitle" Margin="10, 0, 0, 2" HorizontalTextAlignment="Start" TextColor="Black" Text="Conecte o coletor no Bluetooth e posicione o focus para o campo de código."></Label>
+            <Label Grid.Column="0" FontSize="Subtitle" Margin="0, 10, 0, 0" TextColor="Orange" Text="&#xf071;" FontFamily="FontAwesomeBold"></Label>
+            <Label Grid.Column="1" FontSize="Subtitle" Margin="0, 8, 0, 0" HorizontalTextAlignment="Start" TextColor="Black" Text="Conecte o coletor no Bluetooth e posicione o focus para o campo de código."></Label>
         </Grid>
 
         <Grid Grid.Row="1" Margin="0, 10, 10, 0">
@@ -45,7 +45,7 @@
                 <RowDefinition Height="40"></RowDefinition>
             </Grid.RowDefinitions>
 
-            <Label Grid.Column="0" VerticalTextAlignment="Center" Margin="0, 0, 0, 10" HorizontalTextAlignment="Start" TextColor="Black" Text="Código:"></Label>
+            <Label Grid.Column="0" VerticalTextAlignment="Center" Margin="10, 0, 0, 10" HorizontalTextAlignment="Start" TextColor="Black" Text="Código:"></Label>
             <Entry Grid.Column="1" x:Name="txtCodBarra" Unfocused="txtCodBarra_Unfocused" TextColor="Black" Text="{Binding CodigoBarra}" BackgroundColor="LightBlue" Margin="0, 0, 0, 0" ></Entry>
             <Button Grid.Column="2" Text="Câmera" Command="{Binding CameraCommand}" Margin="0, 0, 0, 0" BackgroundColor="{StaticResource Primary}" TextColor="White" />
             <Button Grid.Column="3" Text="Ok" Margin="0, 0, 0, 0" Command="{Binding AddItemCommand}" BackgroundColor="{StaticResource Primary}" TextColor="White" />
@@ -53,6 +53,7 @@
 
         <CollectionView Grid.Row="2" 
                         BackgroundColor="White"  
+                        Margin="10,0,10,10"
                         ItemsSource="{Binding MinhaLista}">
             <CollectionView.Header>
                 <Grid Padding="10" BackgroundColor="LightBlue" Margin="10">
@@ -121,13 +122,13 @@
 
                     <Label Grid.Column="0"
                            Text="Total de Produtos:"
+                           FontAttributes="Bold"
                            VerticalTextAlignment="Center"
                            HorizontalTextAlignment="Center"
                            TextColor="Black"/>
 
                     <Label Grid.Column="1"
                            Text="{Binding TotalProdutos}"
-                           FontAttributes="Bold"
                            VerticalTextAlignment="Center"
                            TextColor="Black"/>
                 </Grid>

@@ -91,7 +91,7 @@ namespace Leitor.ViewModels
 
         private void AdicionarItemLista(string codigoBarras, string nomeProduto)
         {
-            MinhaLista.Add(new ProdutoLeitor
+            MinhaLista.Insert(0, new ProdutoLeitor
             {
                 CodigoBarras = codigoBarras,
                 NomeProduto = nomeProduto

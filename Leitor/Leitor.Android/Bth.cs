@@ -23,7 +23,7 @@ namespace Leitor.Droid
         /// <param name="name">Name of the paired bluetooth device (also a part of the name)</param>
         public void Start(string name, int sleepTime = 200, bool readAsCharArray = false)
         {
-            Task.Run(async () => await Loop(name, sleepTime, readAsCharArray));
+            Task.Run(() => Loop(name, sleepTime, readAsCharArray));
         }
 
         private async Task Loop(string name, int sleepTime, bool readAsCharArray)
@@ -133,6 +133,7 @@ namespace Leitor.Droid
                                         System.Diagnostics.Debug.WriteLine("No data to read");
 
                                     System.Threading.Thread.Sleep(sleepTime);
+
                                     if (!BthSocket.IsConnected)
                                     {
                                         System.Diagnostics.Debug.WriteLine("BthSocket.IsConnected = false, Throw exception");
