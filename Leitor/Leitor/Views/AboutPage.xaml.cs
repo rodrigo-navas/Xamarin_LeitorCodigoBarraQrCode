@@ -18,7 +18,7 @@ namespace Leitor.Views
 
         private void txtCodBarra_Unfocused(object sender, FocusEventArgs e)
         {
-            (BindingContext as AboutViewModel).AdicionarItemCommand(null);
+            (BindingContext as AboutViewModel).AdicionarItemColetor();
         }
 
         protected override void OnAppearing()

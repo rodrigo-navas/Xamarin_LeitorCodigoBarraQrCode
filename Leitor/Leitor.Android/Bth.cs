@@ -1,4 +1,5 @@
 ﻿using Android.Bluetooth;
+using Android.OS;
 using Java.IO;
 using Java.Util;
 using Leitor.Droid;
@@ -12,192 +13,179 @@ using System.Threading.Tasks;
 namespace Leitor.Droid
 {
     public class Bth : IBth
-	{
+    {
+        private CancellationTokenSource _ct { get; set; }
 
-		private CancellationTokenSource _ct { get; set; }
+        #region IBth implementation
+        /// <summary>
+        /// Start the "reading" loop 
+        /// </summary>
+        /// <param name="name">Name of the paired bluetooth device (also a part of the name)</param>
+        public void Start(string name, int sleepTime = 200, bool readAsCharArray = false)
+        {
+            Task.Run(async () => await Loop(name, sleepTime, readAsCharArray));
+        }
 
-		const int RequestResolveError = 1000;
+        private async Task Loop(string name, int sleepTime, bool readAsCharArray)
+        {
+            BluetoothDevice device = null;
+            BluetoothAdapter adapter = BluetoothAdapter.DefaultAdapter;
+            BluetoothSocket BthSocket = null;
 
-		public Bth()
-		{
-		}
+            _ct = new CancellationTokenSource();
+            while (_ct.IsCancellationRequested == false)
+            {
+                try
+                {
+                    Thread.Sleep(sleepTime);
 
-		#region IBth implementation
+                    adapter = BluetoothAdapter.DefaultAdapter;
 
-		/// <summary>
-		/// Start the "reading" loop 
-		/// </summary>
-		/// <param name="name">Name of the paired bluetooth device (also a part of the name)</param>
-		public void Start(string name, int sleepTime = 200, bool readAsCharArray = false)
-		{
-			Task.Run(async () => loop(name, sleepTime, readAsCharArray));
-		}
+                    if (adapter == null)
+                        System.Diagnostics.Debug.WriteLine("No Bluetooth adapter found.");
+                    else
+                        System.Diagnostics.Debug.WriteLine("Adapter found!!");
 
+                    if (!adapter.IsEnabled)
+                        System.Diagnostics.Debug.WriteLine("Bluetooth adapter is not enabled.");
+                    else
+                        System.Diagnostics.Debug.WriteLine("Adapter enabled!");
 
+                    System.Diagnostics.Debug.WriteLine("Try to connect to " + name);
 
-		private async Task loop(string name, int sleepTime, bool readAsCharArray)
-		{
-			BluetoothDevice device = null;
-			BluetoothAdapter adapter = BluetoothAdapter.DefaultAdapter;
-			BluetoothSocket BthSocket = null;
+                    foreach (var bd in adapter.BondedDevices)
+                    {
+                        System.Diagnostics.Debug.WriteLine("Paired devices found: " + bd.Name.ToUpper());
+                        if (bd.Name.ToUpper().IndexOf(name.ToUpper()) >= 0)
+                        {
 
-			//Thread.Sleep(1000);
-			_ct = new CancellationTokenSource();
-			while (_ct.IsCancellationRequested == false)
-			{
+                            System.Diagnostics.Debug.WriteLine("Found " + bd.Name + ". Try to connect with it!");
+                            device = bd;
+                            break;
+                        }
+                    }
 
-				try
-				{
-					Thread.Sleep(sleepTime);
+                    if (device == null)
+                        System.Diagnostics.Debug.WriteLine("Named device not found.");
+                    else
+                    {
+                        ParcelUuid[] uuids = null;
+                        if (device.FetchUuidsWithSdp())
+                            uuids = device.GetUuids();
 
-					adapter = BluetoothAdapter.DefaultAdapter;
+                        if ((uuids != null) && (uuids.Length > 0))
+                        {
+                            foreach (var uuid in uuids)
+                            {
+                                try
+                                {
+                                    if ((int)Android.OS.Build.VERSION.SdkInt >= 10)
+                                        BthSocket = device.CreateInsecureRfcommSocketToServiceRecord(uuid.Uuid);
+                                    else
+                                        BthSocket = device.CreateRfcommSocketToServiceRecord(uuid.Uuid);
 
-					if (adapter == null)
-						System.Diagnostics.Debug.WriteLine("No Bluetooth adapter found.");
-					else
-						System.Diagnostics.Debug.WriteLine("Adapter found!!");
+                                    await BthSocket.ConnectAsync();
+                                    break;
+                                }
+                                catch (Exception ex)
+                                {
+                                    System.Diagnostics.Debug.WriteLine(ex.Message);
+                                }
+                            }
+                        }
 
-					if (!adapter.IsEnabled)
-						System.Diagnostics.Debug.WriteLine("Bluetooth adapter is not enabled.");
-					else
-						System.Diagnostics.Debug.WriteLine("Adapter enabled!");
+                        if (BthSocket != null)
+                        {
+                            if (BthSocket.IsConnected)
+                            {
+                                System.Diagnostics.Debug.WriteLine("Connected!");
+                                var mReader = new InputStreamReader(BthSocket.InputStream);
+                                var buffer = new BufferedReader(mReader);
 
-					System.Diagnostics.Debug.WriteLine("Try to connect to " + name);
+                                while (_ct.IsCancellationRequested == false)
+                                {
+                                    if (buffer.Ready())
+                                    {
+                                        char[] chr = new char[100];
+                                        string barcode = "";
+                                        if (readAsCharArray)
+                                        {
+                                            await buffer.ReadAsync(chr);
+                                            foreach (char c in chr)
+                                            {
+                                                if (c == '\0')
+                                                    break;
+                                                barcode += c;
+                                            }
+                                        }
+                                        else
+                                            barcode = await buffer.ReadLineAsync();
 
-					foreach (var bd in adapter.BondedDevices)
-					{
-						System.Diagnostics.Debug.WriteLine("Paired devices found: " + bd.Name.ToUpper());
-						if (bd.Name.ToUpper().IndexOf(name.ToUpper()) >= 0)
-						{
+                                        if (barcode.Length > 0)
+                                        {
+                                            System.Diagnostics.Debug.WriteLine("Letto: " + barcode);
+                                            Xamarin.Forms.MessagingCenter.Send<App, string>((App)Xamarin.Forms.Application.Current, "Barcode", barcode);
+                                        }
+                                        else
+                                            System.Diagnostics.Debug.WriteLine("No data");
+                                    }
+                                    else
+                                        System.Diagnostics.Debug.WriteLine("No data to read");
 
-							System.Diagnostics.Debug.WriteLine("Found " + bd.Name + ". Try to connect with it!");
-							device = bd;
-							break;
-						}
-					}
+                                    System.Threading.Thread.Sleep(sleepTime);
+                                    if (!BthSocket.IsConnected)
+                                    {
+                                        System.Diagnostics.Debug.WriteLine("BthSocket.IsConnected = false, Throw exception");
+                                        throw new Exception();
+                                    }
+                                }
 
-					if (device == null)
-						System.Diagnostics.Debug.WriteLine("Named device not found.");
-					else
-					{
-						UUID uuid = UUID.FromString("00001101-0000-1000-8000-00805f9b34fb");
-						if ((int)Android.OS.Build.VERSION.SdkInt >= 10) // Gingerbread 2.3.3 2.3.4
-							BthSocket = device.CreateInsecureRfcommSocketToServiceRecord(uuid);
-						else
-							BthSocket = device.CreateRfcommSocketToServiceRecord(uuid);
+                                System.Diagnostics.Debug.WriteLine("Exit the inner loop");
+                            }
+                        }
+                        else
+                            System.Diagnostics.Debug.WriteLine("BthSocket = null");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("EXCEPTION: " + ex.Message);
+                }
+                finally
+                {
+                    if (BthSocket != null)
+                        BthSocket.Close();
+                    device = null;
+                    adapter = null;
+                }
+            }
 
-						if (BthSocket != null)
-						{
-							//Task.Run ((Func<Task>)loop); /*) => {
-							await BthSocket.ConnectAsync();
+            System.Diagnostics.Debug.WriteLine("Exit the external loop");
+        }
 
-							if (BthSocket.IsConnected)
-							{
-								System.Diagnostics.Debug.WriteLine("Connected!");
-								var mReader = new InputStreamReader(BthSocket.InputStream);
-								var buffer = new BufferedReader(mReader);
-								//buffer.re
-								while (_ct.IsCancellationRequested == false)
-								{
-									if (buffer.Ready())
-									{
-										//										string barcode =  buffer
-										//string barcode = buffer.
+        /// <summary>
+        /// Cancel the Reading loop
+        /// </summary>
+        /// <returns><c>true</c> if this instance cancel ; otherwise, <c>false</c>.</returns>
+        public void Cancel()
+        {
+            if (_ct != null)
+            {
+                System.Diagnostics.Debug.WriteLine("Send a cancel to task!");
+                _ct.Cancel();
+            }
+        }
 
-										//string barcode = await buffer.ReadLineAsync();
-										char[] chr = new char[100];
-										//await buffer.ReadAsync(chr);
-										string barcode = "";
-										if (readAsCharArray)
-										{
+        public ObservableCollection<string> PairedDevices()
+        {
+            BluetoothAdapter adapter = BluetoothAdapter.DefaultAdapter;
+            ObservableCollection<string> devices = new ObservableCollection<string>();
 
-											await buffer.ReadAsync(chr);
-											foreach (char c in chr)
-											{
+            foreach (var bd in adapter.BondedDevices)
+                devices.Add(bd.Name);
 
-												if (c == '\0')
-													break;
-												barcode += c;
-											}
-
-										}
-										else
-											barcode = await buffer.ReadLineAsync();
-
-										if (barcode.Length > 0)
-										{
-											System.Diagnostics.Debug.WriteLine("Letto: " + barcode);
-											Xamarin.Forms.MessagingCenter.Send<App, string>((App)Xamarin.Forms.Application.Current, "Barcode", barcode);
-										}
-										else
-											System.Diagnostics.Debug.WriteLine("No data");
-
-									}
-									else
-										System.Diagnostics.Debug.WriteLine("No data to read");
-
-									// A little stop to the uneverending thread...
-									System.Threading.Thread.Sleep(sleepTime);
-									if (!BthSocket.IsConnected)
-									{
-										System.Diagnostics.Debug.WriteLine("BthSocket.IsConnected = false, Throw exception");
-										throw new Exception();
-									}
-								}
-
-								System.Diagnostics.Debug.WriteLine("Exit the inner loop");
-
-							}
-						}
-						else
-							System.Diagnostics.Debug.WriteLine("BthSocket = null");
-
-					}
-
-
-				}
-				catch (Exception ex)
-				{
-					System.Diagnostics.Debug.WriteLine("EXCEPTION: " + ex.Message);
-				}
-
-				finally
-				{
-					if (BthSocket != null)
-						BthSocket.Close();
-					device = null;
-					adapter = null;
-				}
-			}
-
-			System.Diagnostics.Debug.WriteLine("Exit the external loop");
-		}
-
-		/// <summary>
-		/// Cancel the Reading loop
-		/// </summary>
-		/// <returns><c>true</c> if this instance cancel ; otherwise, <c>false</c>.</returns>
-		public void Cancel()
-		{
-			if (_ct != null)
-			{
-				System.Diagnostics.Debug.WriteLine("Send a cancel to task!");
-				_ct.Cancel();
-			}
-		}
-
-		public ObservableCollection<string> PairedDevices()
-		{
-			BluetoothAdapter adapter = BluetoothAdapter.DefaultAdapter;
-			ObservableCollection<string> devices = new ObservableCollection<string>();
-
-			foreach (var bd in adapter.BondedDevices)
-				devices.Add(bd.Name);
-
-			return devices;
-		}
-
-
-		#endregion
-	}
+            return devices;
+        }
+        #endregion
+    }
 }

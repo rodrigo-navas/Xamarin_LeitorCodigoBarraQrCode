@@ -11,14 +11,22 @@ namespace Leitor.ViewModels
     {
         private ObservableCollection<ProdutoLeitor> minhaLista;
         public ObservableCollection<ProdutoLeitor> MinhaLista { get => minhaLista; set => minhaLista = value; }
-        public Command AddItem { get; }
-        public Command Camera { get; }
+        public Command AddItemCommand { get; }
+        public Command CameraCommand { get; }
+        public Command ExcluirItemCommand { get; }
 
         private string _codigoBarra;
         public string CodigoBarra
         {
             get => _codigoBarra;
             set => SetProperty(ref _codigoBarra, value);
+        }
+
+        private decimal _totalProdutos;
+        public decimal TotalProdutos
+        {
+            get => _totalProdutos;
+            set => SetProperty(ref _totalProdutos, value);
         }
 
         #region [ Bluetooth ]
@@ -31,40 +39,54 @@ namespace Leitor.ViewModels
 
         public AboutViewModel()
         {
+            TotalProdutos = 0;
             Title = "Leitor";
             MinhaLista = new ObservableCollection<ProdutoLeitor>();
 
-            AddItem = new Command(AdicionarItemCommand);
-            Camera = new Command(CameraCommand);
+            AddItemCommand = new Command(() =>
+            {
+                if (string.IsNullOrEmpty(CodigoBarra))
+                    return;
+
+                AdicionarItemLista(CodigoBarra, "Produto Manual");
+                CodigoBarra = string.Empty;
+            });
+
+            CameraCommand = new Command(async () =>
+            {
+                ZXingScannerPage scan = new ZXingScannerPage();
+                await Application.Current.MainPage.Navigation.PushModalAsync(scan);
+
+                scan.OnScanResult += (result) =>
+                {
+                    Device.BeginInvokeOnMainThread(async () =>
+                    {
+                        await Application.Current.MainPage.Navigation.PopModalAsync();
+                        AdicionarItemLista(result.Text, "Produto Câmera");
+                    });
+                };
+            });
+
+            ExcluirItemCommand = new Command<ProdutoLeitor>(async (item) =>
+            {
+                var answer = await Application.Current.MainPage.DisplayAlert("Exclusão", "Deseja remover o item?", "Yes", "No");
+
+                if (answer)
+                    MinhaLista.Remove(item);
+
+                EnviarMensagemFocusNovoProduto();
+            });
 
             //IniciarConexaoBluetooth();
         }
 
-        public void AdicionarItemCommand(object obj)
+        public void AdicionarItemColetor()
         {
             if (string.IsNullOrEmpty(CodigoBarra))
-            {
-                //await Application.Current.MainPage.DisplayAlert("Código inválido", "", "Ok");
                 return;
-            }
 
-            AdicionarItemLista(CodigoBarra, "Produto Manual");
+            AdicionarItemLista(CodigoBarra, "Produto Coletor");
             CodigoBarra = string.Empty;
-        }
-
-        private async void CameraCommand(object obj)
-        {
-            var scan = new ZXingScannerPage();
-            await Application.Current.MainPage.Navigation.PushModalAsync(scan);
-
-            scan.OnScanResult += (result) =>
-            {
-                Device.BeginInvokeOnMainThread(async () =>
-                {
-                    await Application.Current.MainPage.Navigation.PopModalAsync();
-                    AdicionarItemLista(result.Text, "Produto Câmera");
-                });
-            };
         }
 
         private void AdicionarItemLista(string codigoBarras, string nomeProduto)
@@ -75,7 +97,18 @@ namespace Leitor.ViewModels
                 NomeProduto = nomeProduto
             });
 
+            EnviarMensagemFocusNovoProduto();
+        }
+
+        private void NotificarQuantidadeProdutos()
+        {
+            TotalProdutos = MinhaLista.Count;
+        }
+
+        private void EnviarMensagemFocusNovoProduto()
+        {
             MessagingCenter.Send<App>((App)Application.Current, "NovoProduto");
+            NotificarQuantidadeProdutos();
         }
 
         private void IniciarConexaoBluetooth()

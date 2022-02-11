@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Leitor.Views.AboutPage"
              xmlns:vm="clr-namespace:Leitor.ViewModels"
+             x:Name="aboutPage"
              Title="{Binding Title}">
 
     <ContentPage.BindingContext>
@@ -18,12 +19,23 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" Margin="0, 10, 0, 0">
+        <Grid HorizontalOptions="Center">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="100"></ColumnDefinition>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+
+            <Label Grid.Column="0" FontSize="Subtitle" Margin="10, 0, 0, 10" TextColor="Orange" Text="&#xf071;" FontFamily="FontAwesomeBold"></Label>
+            <Label Grid.Column="1" FontSize="Subtitle" Margin="10, 0, 0, 2" HorizontalTextAlignment="Start" TextColor="Black" Text="Conecte o coletor no Bluetooth e posicione o focus para o campo de código."></Label>
+        </Grid>
+
+        <Grid Grid.Row="1" Margin="0, 10, 10, 0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="70"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>
                 <ColumnDefinition Width="100"></ColumnDefinition>
                 <ColumnDefinition Width="70"></ColumnDefinition>
@@ -33,36 +45,93 @@
                 <RowDefinition Height="40"></RowDefinition>
             </Grid.RowDefinitions>
 
-            <Label Grid.Column="0" VerticalTextAlignment="Center"  HorizontalTextAlignment="Center" TextColor="Black" Text="Código:"></Label>
+            <Label Grid.Column="0" VerticalTextAlignment="Center" Margin="0, 0, 0, 10" HorizontalTextAlignment="Start" TextColor="Black" Text="Código:"></Label>
             <Entry Grid.Column="1" x:Name="txtCodBarra" Unfocused="txtCodBarra_Unfocused" TextColor="Black" Text="{Binding CodigoBarra}" BackgroundColor="LightBlue" Margin="0, 0, 0, 0" ></Entry>
-            <Button Grid.Column="2" Text="Câmera" Command="{Binding Camera}" Margin="0, 0, 0, 0" BackgroundColor="{StaticResource Primary}" TextColor="White" />
-            <Button Grid.Column="3" Text="Ok" Margin="0, 0, 0, 0" Command="{Binding AddItem}" BackgroundColor="{StaticResource Primary}" TextColor="White" />
+            <Button Grid.Column="2" Text="Câmera" Command="{Binding CameraCommand}" Margin="0, 0, 0, 0" BackgroundColor="{StaticResource Primary}" TextColor="White" />
+            <Button Grid.Column="3" Text="Ok" Margin="0, 0, 0, 0" Command="{Binding AddItemCommand}" BackgroundColor="{StaticResource Primary}" TextColor="White" />
         </Grid>
 
-        <CollectionView Grid.Row="1" 
-                        BackgroundColor="LightBlue"  
+        <CollectionView Grid.Row="2" 
+                        BackgroundColor="White"  
                         ItemsSource="{Binding MinhaLista}">
+            <CollectionView.Header>
+                <Grid Padding="10" BackgroundColor="LightBlue" Margin="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="50" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Label Grid.Column="0"
+                           Text="&#xf2ed;"
+                           VerticalTextAlignment="Center"
+                           HorizontalTextAlignment="Center"
+                           TextColor="Black"
+                           FontFamily="FontAwesomeBold"/>
+                    
+                    <Label Grid.Column="1"
+                           Text="Código De Barras"
+                           FontAttributes="Bold"
+                           VerticalTextAlignment="Center"
+                           TextColor="Black"/>
+
+                    <Label Grid.Column="2"
+                           Text="Produto"
+                           FontAttributes="Bold"
+                           VerticalTextAlignment="Center"
+                           TextColor="Black"/>
+                </Grid>
+            </CollectionView.Header>
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <Grid Padding="10">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="50" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        <Label Grid.Column="0"
+                        <Button Grid.Column="0" 
+                                Text="&#xf2ed;" 
+                                Command="{Binding Path=BindingContext.ExcluirItemCommand, Source={x:Reference aboutPage}}"
+                                CommandParameter="{Binding .}"
+                                Margin="0, 0, 0, 0" 
+                                BackgroundColor="{StaticResource Primary}"
+                                TextColor="White"
+                                FontFamily="FontAwesomeBold"/>
+                        
+                        <Label Grid.Column="1"
                                Text="{Binding CodigoBarras}"
-                               FontAttributes="Bold"
+                               VerticalTextAlignment="Center"
                                TextColor="Black"/>
 
-                        <Label Grid.Column="1"
+                        <Label Grid.Column="2"
                                Text="{Binding NomeProduto}"
-                               FontAttributes="Italic"
-                               VerticalOptions="End"
+                               VerticalTextAlignment="Center"
                                TextColor="Black"/>
                     </Grid>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
+            <CollectionView.Footer>
+                <Grid Padding="10" BackgroundColor="LightBlue" Margin="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Label Grid.Column="0"
+                           Text="Total de Produtos:"
+                           VerticalTextAlignment="Center"
+                           HorizontalTextAlignment="Center"
+                           TextColor="Black"/>
+
+                    <Label Grid.Column="1"
+                           Text="{Binding TotalProdutos}"
+                           FontAttributes="Bold"
+                           VerticalTextAlignment="Center"
+                           TextColor="Black"/>
+                </Grid>
+            </CollectionView.Footer>
         </CollectionView>
     </Grid>
 
